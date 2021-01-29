@@ -1,0 +1,15 @@
+<% layout('./layouts/boilerplate') %>
+<%- include('./partials/mapbox') %>
+
+<h2 class="text-center title mb-3">Coronavirus Distribution Map</h2>
+<h6 class="text-center subtitle text-white">
+    <span class="danger1-text">red:>90K</span>  <span class="danger2-text">Orange:45K-90K</span>  <span class="danger3-text">Yellow:15K-45K</span>  <span class="danger4-text">White:&#60;15K</span></h5>
+<h6 class="text-center subtitle text-white">By total cases</h6>
+<p class="text-center subtitle mb-3 text-white">View each country individually for more details</p>
+<div id="map"></div>
+
+
+<script src="https://unpkg.com/es6-promise@4.2.4/dist/es6-promise.auto.min.js"></script>
+<script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
+<script>let countries = <%- JSON.stringify(countries) %>;</script>
+<script src="/javascripts/map.js"></script>

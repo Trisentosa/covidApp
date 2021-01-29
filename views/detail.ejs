@@ -1,0 +1,114 @@
+<% layout('./layouts/boilerplate') %>
+<%
+    function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    function parseAndTranslate(x){
+        return numberWithCommas(parseFloat(x))
+    }
+%>
+<div class="container">
+<h1 class="title text-center mb-4">
+    <%= countryData.country %>
+</h1>
+
+<section class="row my-3 justify-content-center">
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">New Cases:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.todayCases) %>
+        </h4>
+    </div>
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">New Deaths:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.todayDeaths) %>
+        </h4>
+    </div>
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">Active:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.active) %>
+        </h4>
+    </div>
+</section>
+
+<section class="row my-3 justify-content-center">
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">Total Cases:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.cases) %>
+        </h4>
+    </div>
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">Total Deaths:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.deaths) %>
+        </h4>
+    </div>
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">Recovered:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.recovered) %>
+        </h4>
+    </div>
+</section>
+
+<section class="row my-3 justify-content-center">
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">Cases/million:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.casesPerOneMillion) %>
+        </h4>
+    </div>
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">Deaths/million:</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.deathsPerOneMillion) %>
+        </h4>
+    </div>
+    <div class="col-4 rounded-pill bg-dark text-white p-2 mr-2">
+        <h5 class="text-center">Populations</h5>
+        <h4 class="text-center">
+            <%= parseAndTranslate(countryData.population) %>
+        </h4>
+    </div>
+</section>
+
+<div class="d-flex justify-content-center">
+    <div class="dropdown m-2">
+        <button type="button" class="btn btn-secondary dropdown-toggle" id="daysBtn" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" data-offset="10,20">
+            <%= user.days %> days
+        </button>
+        <div class="dropdown-menu" aria-labelledby="days">
+            <a class="dropdown-item daysOptions">7 Days</a>
+            <a class="dropdown-item daysOptions">14 Days</a>
+            <a class="dropdown-item daysOptions">30 Days</a>
+        </div>
+    </div>
+    <div class="dropdown m-2">
+        <button type="button" class="btn btn-secondary dropdown-toggle" id="typeBtn" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" data-offset="10,20">
+            <%= user.type %>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="type">
+            <a class="dropdown-item typeOptions">New Cases</a>
+            <a class="dropdown-item typeOptions">Total Cases</a>
+        </div>
+    </div>
+</div>
+
+
+<canvas id="casesChart" class="chart" width="500" height="150"></canvas>
+<canvas id="deathsChart" class="chart" width="500" height="150"></canvas>
+<canvas id="recoveredChart" class="chart" width="500" height="150"></canvas>
+<a href="/" class="btn btn-info text-center px-5 mt-3">Back to map</a>
+
+</div>
+
+<script>const user = <%- JSON.stringify(user) %>; </script>
+<script>const historicalData = <%- JSON.stringify(historicalData) %>;</script>
+<script src="/javascripts/chartOption.js"></script>
+<script src="/javascripts/dataChart.js"></script>
+
