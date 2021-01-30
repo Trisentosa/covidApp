@@ -1,6 +1,18 @@
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
+
 const express = require('express');
 const app = express();
 const path = require('path');
+
+//helmet
+const helmet = require("helmet");
+app.use(helmet({ contentSecurityPolicy: false }));
+
+//ExpressError
+const ExpressError = require('./utilities/ExpressError.js')
+const catchAsync = require('./utilities/catchAsync.js')
 
 //novelcovid config
 const covid = require('novelcovid');
@@ -9,9 +21,8 @@ covid.settings({
 })
 
 //mapbox
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiaGFwcHl0cmkiLCJhIjoiY2tqbmExdTc4MGJjMzJ2cHI5amNpMHRrNCJ9.0VgYVKFUIpjkY3gghI6jng'
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const geocoder = mbxGeocoding({ accessToken: MAPBOX_TOKEN });
+const geocoder = mbxGeocoding({ accessToken: process.env.MAPBOX_TOKEN });
 
 //EJS
 app.set('view engine', 'ejs')  //tell we're using ejs
@@ -31,66 +42,40 @@ const popupCountries = require('./public/javascripts/popupCountries')
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(express.json()) // for parsing application/json
 
-app.get('/dev',async(req,res)=>{
-    const data = await covid.historical.countries({country:'Indonesia',date:15});
-    res.send(data);
-})
-
-app.get('/', async(req,res)=>{
+app.get('/', catchAsync(async(req,res)=>{
     const countriesLong = await covid.countries();
     let countries = [];
     countriesLong.forEach((country)=>{
         countries.push(new popupCountries(country.country,country.cases,country.deaths,country.countryInfo.flag))
         })
     res.render('index',{countries});    
-})
+}))
 
-app.get('/:country',async(req,res)=>{
+app.get('/:country',catchAsync(async(req,res)=>{
     const{country} = req.params;
     const userDefault = {
         days: 30,
         type: 'New Cases'
     }
     const countryData = await covid.countries({ country: country });
+    if (countryData.message === "Country not found or doesn't have any cases"){
+        res.redirect('/');
+    }
     const historicalData = await covid.historical.countries({ country: country, days:userDefault.days});
     res.render('detail',{countryData, historicalData, user:userDefault})
+}))
+
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page Not Found!!!', 404));
 })
 
-app.listen(3000, () => {
-    console.log(`Connected to port 3000`)
+app.use((err, req, res, next) => {
+    const { message = 'Something Went Wrong', status = 500 } = err;
+    res.status(status).send(message);
 })
 
 
-//  {
-//     updated: 1611367466361,
-//     country: 'Israel',
-//     countryInfo: {
-//       _id: 376,
-//       iso2: 'IL',
-//       iso3: 'ISR',
-//       lat: 31.5,
-//       long: 34.75,
-//       flag: 'https://disease.sh/assets/img/flags/il.png'
-//     },
-//     cases: 589028,
-//     todayCases: 0,
-//     deaths: 4266,
-//     todayDeaths: 0,
-//     recovered: 504820,
-//     todayRecovered: 0,
-//     active: 79942,
-//     critical: 1182,
-//     casesPerOneMillion: 64042,
-//     deathsPerOneMillion: 464,
-//     tests: 9925207,
-//     testsPerOneMillion: 1079110,
-//     population: 9197590,
-//     continent: 'Asia',
-//     oneCasePerPeople: 16,
-//     oneDeathPerPeople: 2156,
-//     oneTestPerPeople: 1,
-//     activePerOneMillion: 8691.62,
-//     recoveredPerOneMillion: 54886.12,
-//     criticalPerOneMillion: 128.51
-//   }
-
+const port = process.env.PORT || 3000
+app.listen(port, () => {
+    console.log(`Listeing on port ${port}`)
+})

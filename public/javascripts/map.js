@@ -13,7 +13,7 @@ function addColor(nums){
         return 'danger4';
     }
 }
-mapboxgl.accessToken = 'pk.eyJ1IjoiaGFwcHl0cmkiLCJhIjoiY2tqbmExdTc4MGJjMzJ2cHI5amNpMHRrNCJ9.0VgYVKFUIpjkY3gghI6jng';
+mapboxgl.accessToken = mapToken;
 var mapboxClient = mapboxSdk({ accessToken: mapboxgl.accessToken });
 var map = new mapboxgl.Map({
     container: 'map',
